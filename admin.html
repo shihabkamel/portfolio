@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Shihab Kamel</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F9FBF9; --surface:#EFF3EF; --surface-2:#E7ECE7;
+    --ink:#151A17; --muted:#5C665F; --line:#DCE3DB;
+    --accent:#3B6E56; --accent-ink:#25493A; --accent-soft:#E4EEE7;
+    --danger:#8A3B3B; --danger-soft:#F3E6E6;
+    --radius:9px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Inter',sans-serif; font-size:15px; line-height:1.55;
+  }
+  h1,h2{font-family:'Fraunces',serif; font-weight:600; margin:0;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+
+  /* ---- config bar ---- */
+  #configBar{
+    background:var(--surface-2); border-bottom:1px solid var(--line);
+    padding:10px 24px; font-size:12.5px; display:flex; gap:10px; align-items:center;
+    font-family:'JetBrains Mono',monospace; color:var(--muted);
+  }
+  #configBar input{
+    flex:1; max-width:420px; padding:6px 10px; border:1px solid var(--line);
+    border-radius:6px; font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    background:var(--paper); color:var(--ink);
+  }
+  #configBar button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; padding:6px 10px;
+    border-radius:6px; border:1px solid var(--line); background:var(--paper); cursor:pointer;
+  }
+
+  .wrap{max-width:880px; margin:0 auto; padding:40px 24px 80px;}
+
+  /* ---- login ---- */
+  #loginView{max-width:380px; margin:80px auto 0;}
+  #loginView p.eyebrow{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); margin-bottom:10px;}
+  #loginView h1{font-size:1.6rem; margin-bottom:24px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:12.5px; font-family:'JetBrains Mono',monospace; color:var(--muted); margin-bottom:6px;}
+  .field input, .field textarea{
+    width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:7px;
+    background:var(--surface); color:var(--ink); font-family:'Inter',sans-serif; font-size:14.5px;
+  }
+  .field input:focus, .field textarea:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .field textarea{font-family:'JetBrains Mono',monospace; font-size:13.5px; resize:vertical;}
+
+  .btn{
+    font-size:14px; font-weight:500; padding:10px 18px; border-radius:7px;
+    border:1px solid transparent; cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:hover{background:var(--accent-ink);}
+  .btn-ghost{background:transparent; border-color:var(--line); color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--ink);}
+  .btn-danger{background:var(--danger-soft); color:var(--danger); border-color:var(--danger-soft);}
+  .btn-danger:hover{background:var(--danger); color:#fff;}
+  .btn:disabled{opacity:0.5; cursor:not-allowed;}
+
+  #loginError{color:var(--danger); font-size:13.5px; margin-top:10px; display:none;}
+
+  /* ---- dashboard ---- */
+  #dashView{display:none;}
+  .dash-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:32px; flex-wrap:wrap; gap:14px;}
+  .dash-head p.eyebrow{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); margin-bottom:6px;}
+
+  .post-row{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:16px 0; border-top:1px solid var(--line);
+  }
+  .post-row:first-of-type{border-top:none;}
+  .post-title{font-weight:600; margin-bottom:4px;}
+  .post-meta{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); display:flex; gap:10px; align-items:center;}
+  .status-pill{
+    font-size:11px; padding:2px 8px; border-radius:20px; font-family:'JetBrains Mono',monospace;
+  }
+  .status-pill.published{background:var(--accent-soft); color:var(--accent-ink);}
+  .status-pill.draft{background:var(--surface-2); color:var(--muted);}
+  .post-actions{display:flex; gap:8px; flex-shrink:0;}
+  .post-actions button{font-size:12.5px; padding:6px 12px;}
+
+  #emptyPosts{
+    border:1px dashed var(--line); border-radius:var(--radius); padding:40px 20px;
+    text-align:center; color:var(--muted); font-size:14px; display:none;
+  }
+
+  /* ---- editor ---- */
+  #editorView{display:none;}
+  .editor-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;}
+  .checkbox-row{display:flex; align-items:center; gap:8px; margin-bottom:20px;}
+  .checkbox-row input{width:16px; height:16px;}
+  .checkbox-row label{font-size:14px; font-family:'Inter',sans-serif; color:var(--ink);}
+  .editor-actions{display:flex; gap:10px; margin-top:24px; align-items:center;}
+  #saveMsg{font-size:13px; color:var(--accent-ink); font-family:'JetBrains Mono',monospace;}
+  .helptext{font-size:12.5px; color:var(--muted); margin-top:4px;}
+</style>
+</head>
+<body>
+
+<div id="configBar">
+  <span>API base:</span>
+  <input id="apiBaseInput" type="text" placeholder="https://your-api.onrender.com/api">
+  <button id="saveApiBase">Save</button>
+  <span id="apiBaseStatus"></span>
+</div>
+
+<!-- LOGIN -->
+<div id="loginView" class="wrap">
+  <p class="eyebrow mono">POST /login</p>
+  <h1>Sign in to write</h1>
+  <form id="loginForm">
+    <div class="field">
+      <label for="username">Username</label>
+      <input id="username" type="text" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Sign in →</button>
+    <p id="loginError">Invalid username or password.</p>
+  </form>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashView" class="wrap">
+  <div class="dash-head">
+    <div>
+      <p class="eyebrow mono">GET /admin/posts</p>
+      <h2>Your posts</h2>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-primary" id="newPostBtn">New post +</button>
+      <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+  <div id="postList"></div>
+  <div id="emptyPosts">No posts yet — click "New post" to write your first one.</div>
+</div>
+
+<!-- EDITOR -->
+<div id="editorView" class="wrap">
+  <div class="editor-head">
+    <h2 id="editorTitle">New post</h2>
+    <button class="btn btn-ghost" id="backToDashBtn">← Back</button>
+  </div>
+  <form id="postForm">
+    <input type="hidden" id="postId">
+    <div class="field">
+      <label for="titleInput">Title</label>
+      <input id="titleInput" type="text" required>
+    </div>
+    <div class="field">
+      <label for="slugInput">Slug (URL path — leave blank to auto-generate)</label>
+      <input id="slugInput" type="text" placeholder="my-post-title">
+    </div>
+    <div class="field">
+      <label for="excerptInput">Excerpt (shown in the post list)</label>
+      <input id="excerptInput" type="text">
+    </div>
+    <div class="field">
+      <label for="contentInput">Content (Markdown)</label>
+      <textarea id="contentInput" rows="14" required></textarea>
+      <p class="helptext">Written as plain Markdown — the public site renders it as-is for now.</p>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="publishedInput">
+      <label for="publishedInput">Published (visible on the public site)</label>
+    </div>
+    <div class="editor-actions">
+      <button type="submit" class="btn btn-primary" id="saveBtn">Save post</button>
+      <button type="button" class="btn btn-danger" id="deleteBtn" style="display:none;">Delete</button>
+      <span id="saveMsg"></span>
+    </div>
+  </form>
+</div>
+
+<script>
+  // ---------- config ----------
+  const LS_API_BASE = 'blog_admin_api_base';
+  const LS_TOKEN = 'blog_admin_token';
+
+  const apiBaseInput = document.getElementById('apiBaseInput');
+  const apiBaseStatus = document.getElementById('apiBaseStatus');
+  apiBaseInput.value = localStorage.getItem(LS_API_BASE) || '';
+
+  document.getElementById('saveApiBase').addEventListener('click', () => {
+    localStorage.setItem(LS_API_BASE, apiBaseInput.value.trim());
+    apiBaseStatus.textContent = 'saved';
+    setTimeout(() => apiBaseStatus.textContent = '', 1500);
+  });
+
+  function apiBase(){ return (localStorage.getItem(LS_API_BASE) || '').replace(/\/+$/,''); }
+  function token(){ return localStorage.getItem(LS_TOKEN); }
+
+  async function api(path, options = {}) {
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+    if (token()) headers['Authorization'] = 'Bearer ' + token();
+    const res = await fetch(apiBase() + path, Object.assign({}, options, { headers }));
+    if (res.status === 401 || res.status === 403) {
+      logout();
+      throw new Error('Session expired — please sign in again.');
+    }
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || 'Request failed');
+    }
+    return res.status === 204 ? null : res.json();
+  }
+
+  // ---------- views ----------
+  const loginView = document.getElementById('loginView');
+  const dashView = document.getElementById('dashView');
+  const editorView = document.getElementById('editorView');
+
+  function showView(view) {
+    [loginView, dashView, editorView].forEach(v => v.style.display = 'none');
+    view.style.display = 'block';
+  }
+
+  function logout() {
+    localStorage.removeItem(LS_TOKEN);
+    showView(loginView);
+  }
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+
+  // ---------- login ----------
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    if (!apiBase()) {
+      errEl.textContent = 'Set the API base URL above first.';
+      errEl.style.display = 'block';
+      return;
+    }
+    try {
+      const data = await api('/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: document.getElementById('username').value,
+          password: document.getElementById('password').value,
+        }),
+      });
+      localStorage.setItem(LS_TOKEN, data.token);
+      await loadDashboard();
+    } catch (err) {
+      errEl.textContent = err.message || 'Invalid username or password.';
+      errEl.style.display = 'block';
+    }
+  });
+
+  // ---------- dashboard ----------
+  async function loadDashboard() {
+    showView(dashView);
+    const list = document.getElementById('postList');
+    const empty = document.getElementById('emptyPosts');
+    list.innerHTML = '';
+    try {
+      const posts = await api('/admin/posts');
+      if (!posts.length) {
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+      posts.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'post-row';
+        row.innerHTML = `
+          <div>
+            <div class="post-title">${escapeHtml(p.title)}</div>
+            <div class="post-meta">
+              <span class="status-pill ${p.published ? 'published' : 'draft'}">${p.published ? 'published' : 'draft'}</span>
+              <span>/${escapeHtml(p.slug)}</span>
+            </div>
+          </div>
+          <div class="post-actions">
+            <button class="btn btn-ghost" data-edit="${p.id}">Edit</button>
+          </div>`;
+        list.appendChild(row);
+      });
+      list.querySelectorAll('[data-edit]').forEach(btn => {
+        btn.addEventListener('click', () => openEditor(btn.getAttribute('data-edit')));
+      });
+    } catch (err) {
+      list.innerHTML = `<p style="color:var(--danger)">${escapeHtml(err.message)}</p>`;
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  document.getElementById('backToDashBtn').addEventListener('click', loadDashboard);
+
+  // ---------- editor ----------
+  const postForm = document.getElementById('postForm');
+  const deleteBtn = document.getElementById('deleteBtn');
+  let currentId = null;
+
+  document.getElementById('newPostBtn').addEventListener('click', () => openEditor(null));
+
+  async function openEditor(id) {
+    currentId = id;
+    document.getElementById('saveMsg').textContent = '';
+    postForm.reset();
+    document.getElementById('editorTitle').textContent = id ? 'Edit post' : 'New post';
+    deleteBtn.style.display = id ? 'inline-flex' : 'none';
+
+    if (id) {
+      try {
+        const p = await api('/admin/posts/' + id);
+        document.getElementById('postId').value = p.id;
+        document.getElementById('titleInput').value = p.title;
+        document.getElementById('slugInput').value = p.slug;
+        document.getElementById('excerptInput').value = p.excerpt || '';
+        document.getElementById('contentInput').value = p.content || '';
+        document.getElementById('publishedInput').checked = p.published;
+      } catch (err) {
+        alert(err.message);
+        return;
+      }
+    }
+    showView(editorView);
+  }
+
+  postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveMsg = document.getElementById('saveMsg');
+    const payload = {
+      title: document.getElementById('titleInput').value,
+      slug: document.getElementById('slugInput').value,
+      excerpt: document.getElementById('excerptInput').value,
+      content: document.getElementById('contentInput').value,
+      published: document.getElementById('publishedInput').checked,
+    };
+    try {
+      if (currentId) {
+        await api('/admin/posts/' + currentId, { method: 'PUT', body: JSON.stringify(payload) });
+      } else {
+        await api('/admin/posts', { method: 'POST', body: JSON.stringify(payload) });
+      }
+      saveMsg.textContent = 'Saved.';
+      await loadDashboard();
+    } catch (err) {
+      saveMsg.textContent = err.message;
+      saveMsg.style.color = 'var(--danger)';
+    }
+  });
+
+  deleteBtn.addEventListener('click', async () => {
+    if (!currentId) return;
+    if (!confirm('Delete this post? This cannot be undone.')) return;
+    try {
+      await api('/admin/posts/' + currentId, { method: 'DELETE' });
+      await loadDashboard();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // ---------- boot ----------
+  if (token()) {
+    loadDashboard().catch(() => showView(loginView));
+  } else {
+    showView(loginView);
+  }
+</script>
+
+</body>
+</html>
